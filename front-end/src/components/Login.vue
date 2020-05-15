@@ -1,26 +1,21 @@
 <template>
   <div class="container">
-    <!-- <alert
-    v-if="sharedState.is_new"
-    v-bind:variant="alertVariant"
-    v-bing:message="alertMessage">  <!-- 如果是新用户，alert，从而实现提示注册成功。从下面的data中接受传来的数据 
-    </alert> -->
     <h1>Sign In</h1>
     <div class="row">
       <div class="col-md-4">
         <form @submit.prevent="onSubmit">
-          <div class="form-group">
+          <div class="form-group" v-bind:class="{'u-has-error-v1': loginForm.usernameError}">
             <label for="username">Username</label>
-            <input type="text" v-model="loginForm.username" class="form-control" v-bind:class="{'is-invalid': loginForm.usernameError}" id="username" placeholder="">
-            <div v-show="loginForm.usernameError" class="invalid-feedback">{{ loginForm.usernameError }}</div>
+            <input type="text" v-model="loginForm.username" class="form-control" id="username" placeholder="">
+            <small class="form-control-feedback" v-show="loginForm.usernameError">{{ loginForm.usernameError }}</small>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-bind:class="{'u-has-error-v1': loginForm.passwordError}">
             <label for="password">Password</label>
-            <input type="password" v-model="loginForm.password" class="form-control" v-bind:class="{'is-invalid': loginForm.passwordError}" id="password" placeholder="">
-            <div v-show="loginForm.passwordError" class="invalid-feedback">{{ loginForm.passwordError }}</div>
+            <input type="password" v-model="loginForm.password" class="form-control" id="password" placeholder="">
+            <small class="form-control-feedback" v-show="loginForm.passwordError">{{ loginForm.passwordError }}</small>
           </div>
           <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>   
+        </form>
       </div>
     </div>
     <br>
@@ -33,24 +28,15 @@
 </template>
 
 <script>
-import axios from 'axios'
-import Alert from './Alert'
-import store from '../store.js'
+import store from '../store'
 
 export default {
-  name: 'Login',
-  components: {
-    alert: Alert
-  },
+  name: 'Login',  //this is the name of the component
   data () {
     return {
-      sharedState: store.state,
-      //alertVariant: 'info',
-      // alertMessage: 'Congratulations, you are now a registered user !',
       loginForm: {
         username: '',
         password: '',
-        submitted: false,  // 是否点击了 submit 按钮
         errors: 0,  // 表单是否在前端验证通过，0 表示没有错误，验证通过
         usernameError: null,
         passwordError: null
@@ -59,14 +45,13 @@ export default {
   },
   methods: {
     onSubmit (e) {
-      this.loginForm.submitted = true  // 先更新状态
-      this.loginForm.errors = 0
+      this.loginForm.errors = 0  // 重置
 
-      if(!this.loginForm.username){
-          this.loginForm.errors++
-          this.loginForm.usernameError = 'Username required.'
+      if (!this.loginForm.username) {
+        this.loginForm.errors++
+        this.loginForm.usernameError = 'Username required.'
       } else {
-          this.loginForm.usernameError = null
+        this.loginForm.usernameError = null
       }
 
       if (!this.loginForm.password) {
@@ -81,7 +66,7 @@ export default {
         return false
       }
 
-      const path = '/tokens'    //登录完就需要tokens
+      const path = '/api/tokens'
       // axios 实现Basic Auth需要在config中设置 auth 这个属性即可
       this.$axios.post(path, {}, {
         auth: {
@@ -91,7 +76,6 @@ export default {
       }).then((response) => {
           // handle success
           window.localStorage.setItem('madblog-token', response.data.token)
-          //store.resetNotNewAction()
           store.loginAction()
 
           const name = JSON.parse(atob(response.data.token.split('.')[1])).name
