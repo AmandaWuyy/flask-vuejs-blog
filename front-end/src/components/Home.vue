@@ -2,7 +2,6 @@
   <div class="container">
     <alert 
       v-for="(alert, index) in alerts" :key="index"
-      v-if="alert.showAlert"
       v-bind:variant="alert.alertVariant"
       v-bind:message="alert.alertMessage">
     </alert>
@@ -22,19 +21,19 @@ export default {
     return {
       alerts: [
         {
-          showAlert: true,
+          //showAlert: true,
           alertVariant: 'danger',
-          alertMessage: 0
+          alertMessage: 'Oops..'
         },
         {
-          showAlert: true,
+          //showAlert: true,
           alertVariant: 'info',
-          alertMessage: 1
+          alertMessage: 'Hi'
         },
         {
-          showAlert: true,
-          alertVariant: 'dark',
-          alertMessage: 2
+          //showAlert: true,
+          alertVariant: 'success',
+          alertMessage: 'OK'
         }
       ]
     }
